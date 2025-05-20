@@ -6,6 +6,6 @@
 # include <GLFW/glfw3.h>
 
 // Parser Module
-# include "../headers/parser.hpp"
+# include "../headers/parser/parser.hpp"
 
 #endif

@@ -10,7 +10,7 @@ DATE	=
 FILE_EXTENSION	= .cpp
 SRCS_PATH		= ./srcs
 INCLUDE_PATH	= ./headers
-SRCS			= parser.cpp
+SRCS			= /parser/parser.cpp
 MAIN			= main.cpp
 
 ################################################################################
