@@ -1,4 +1,7 @@
 .idea
 .vscode
 .env
-scop
+
+# project files
+scop 
+objs/*
