@@ -1,13 +1,13 @@
 #ifndef Parser_HPP
-#define Parser_HPP
+# define Parser_HPP
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <vector>
-#include <array>
-#include <memory>
+# include <iostream>
+# include <fstream>
+# include <sstream>
+# include <string>
+# include <vector>
+# include <array>
+# include <memory>
 
 // Forward declaration of the struct
 struct VertexData;

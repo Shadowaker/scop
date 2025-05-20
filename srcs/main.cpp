@@ -1,8 +1,4 @@
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <iostream>
-
-#include "../headers/parser.hpp"
+#include "../headers/scop.hpp"
 
 const char* vertexShaderSource = R"glsl(
     #version 330 core
