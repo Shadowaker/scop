@@ -10,21 +10,21 @@
 # include <memory>
 
 // Forward declaration of the struct
-struct VertexData;
+typedef struct s_VertexData {
+    float position[3];
+    float normal[3];
+    float texCoord[2];
+} t_VertexData;  
+
 
 // Class to parse .obj files
 class Parser {
     private:
-        struct VertexData {
-            float position[3];
-            float normal[3];
-            float texCoord[2];
-        };
 
-        std::vector<VertexData>                     vertices;
+        std::vector<t_VertexData>                   vertices;
         std::vector<std::array<float, 3>>           normals;
         std::vector<std::array<float, 2>>           textures;
-        std::vector<std::array<unsigned int, 3>>    faces;
+		std::vector<std::vector<unsigned int>>		rawFaces;
         std::string                                 filepath;
         
         void                        parseLine(const std::string& line);
@@ -38,20 +38,16 @@ class Parser {
         Parser(const std::string& filepath);
         ~Parser();
 
-        Parser(const Parser&);
         Parser& operator=(const Parser&);
 
-        // Move constructor and move assignment operator (Rule of Zero/Five)
-        Parser(Parser&&);
-        Parser& operator=(Parser&&);
-
         bool                                                parse(const std::string& filepath);
-        const std::vector<VertexData>&                      getVertices() const;
+        const std::vector<t_VertexData>&                    getVertices() const;
         const std::vector<std::array<float, 3>>&            getNormals() const;
         const std::vector<std::array<float, 2>>&            getTextures() const;
-        const std::vector<std::array<unsigned int, 3>>&     getFaces() const;
+        const std::vector<std::vector<unsigned int>>&		getRawFaces() const;
 
         void                                                printVertices() const;
+        void                                                inspect() const;
 
         
 	class ParserException : public std::exception {

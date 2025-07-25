@@ -10,7 +10,7 @@ DATE	=
 FILE_EXTENSION	= .cpp
 SRCS_PATH		= ./srcs
 INCLUDE_PATH	= ./headers
-SRCS			= /parser/parser.cpp
+SRCS			= ./parser/parser.cpp ./modelRenderer/modelRenderer.cpp
 MAIN			= main.cpp
 
 ################################################################################
@@ -182,7 +182,7 @@ else
 endif
 	@printf "%b" "$(OBJ_COLOR)Author:	$(WARN_COLOR)$(AUTHOR)\n"
 	@printf "%b" "$(OBJ_COLOR)Date: 	$(WARN_COLOR)$(DATE)\n\033[m"
-	@printf "%b" "$(OBJ_COLOR)CC: 	$(WARN_COLOR)$(CC)\n\033[m"
+	@printf "%b" "$(OBJ_COLOR)CC: 		$(WARN_COLOR)$(CC)\n\033[m"
 	@printf "%b" "$(OBJ_COLOR)Flags: 	$(WARN_COLOR)$(CFLAGS)\n\033[m"
 	@echo
 
@@ -190,6 +190,7 @@ endif
 -include $(DEPS) $(DEPS_MAIN)
 $(NAME):	${OBJS} ${OBJ_MAIN}
 #			@$(call display_progress_bar)
+			@$(CC) $(CFLAGS) $(DFLAGS) -I$(INCLUDE_PATH) -o $@ ${OBJS} ${OBJ_MAIN} $(LDFLAGS)
 			@$(call run_and_test,$(CC) $(CFLAGS) $(DFLAGS) -I$(INCLUDE_PATH) -o $@ ${OBJS} ${OBJ_MAIN} $(LDFLAGS))
 
 setup:
@@ -198,6 +199,7 @@ setup:
 objs/%.o: 	$(SRCS_PATH)/%$(FILE_EXTENSION)
 			@mkdir -p $(dir $@)
 #			@$(call display_progress_bar)
+			@$(CC) $(CFLAGS) $(DFLAGS) -c $< -o $@ -I$(INCLUDE_PATH)
 			@$(call run_and_test,$(CC) $(CFLAGS) $(DFLAGS) -c $< -o $@ -I$(INCLUDE_PATH))
 
 clean:		header
