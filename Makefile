@@ -1,16 +1,16 @@
 
-NAME	= scop
-CC		= c++
-LDFLAGS = -lglfw -lGLEW -lGL
-CFLAGS = -std=c++17 -g -Wall -Wextra -Werror
-DFLAGS	= -MMD -MF $(@:.o=.d)
-AUTHOR	= dridolfo
-DATE	= 
+NAME		= scop
+CC			= c++
+LDFLAGS		= -lglfw -lGLEW -lGL
+CFLAGS		= -std=c++17 -g -Wall -Wextra -Werror
+DFLAGS		= -MMD -MF $(@:.o=.d)
+AUTHOR		= dridolfo
+DATE		= 08/2025
 
 FILE_EXTENSION	= .cpp
 SRCS_PATH		= ./srcs
 INCLUDE_PATH	= ./headers
-SRCS			= ./parser/parser.cpp ./modelRenderer/modelRenderer.cpp
+SRCS			= ./model/model.cpp ./shaders/shaders.cpp ./drivers/window.cpp ./drivers/utils.cpp ./key.cpp ./camera/camera.cpp
 MAIN			= main.cpp
 
 ################################################################################
