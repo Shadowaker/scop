@@ -29,7 +29,10 @@
 // Camera
 # include "camera/camera.hpp"
 
+// key.cpp
+void		key(GLFWwindow *window, int &version, Model &model, Camera &camera);
 
-void	key(GLFWwindow *window, int &version, Model &model, Camera &camera);
+// math_utils.cpp
+glm::vec3	calculateCenter(const std::vector<float> &triangles);
 
 #endif

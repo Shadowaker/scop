@@ -10,7 +10,14 @@ DATE		= 08/2025
 FILE_EXTENSION	= .cpp
 SRCS_PATH		= ./srcs
 INCLUDE_PATH	= ./headers
-SRCS			= ./model/model.cpp ./shaders/shaders.cpp ./drivers/window.cpp ./drivers/utils.cpp ./key.cpp ./camera/camera.cpp
+SRCS			= 	./model/model.cpp \
+					./shaders/shaders.cpp \
+					./drivers/window.cpp \
+					./drivers/utils.cpp \
+					./key.cpp \
+					./camera/camera.cpp \
+					./utils.cpp \
+					./datrix/datrix.cpp
 MAIN			= main.cpp
 
 ################################################################################

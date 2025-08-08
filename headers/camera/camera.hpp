@@ -4,11 +4,14 @@
 # include <glm/gtc/type_ptr.hpp>
 # include <glm/glm.hpp>
 
+#include "datrix/datrix.hpp"
+
 enum moves {
 	UP, DOWN, LEFT, RIGHT, ROT_RIGHT, ROT_LEFT
 };
 
-constexpr float SPEED = 0.05f;
+constexpr float SPEED = 0.1f;
+constexpr float ROT_SPEED = 0.02f;
 constexpr glm::vec3 DEFAULT_UP(0.0f, 0.5f, 0.0f);
 
 
@@ -25,6 +28,7 @@ class Camera {
 		glm::vec3	getFront() const;
 		glm::vec3	getUp() const;
 		glm::mat4	getView() const;
+		Datrix		getView2() const;
 
 		void	setPosition(glm::vec3 new_position);
 		void	setFront(glm::vec3 new_front);

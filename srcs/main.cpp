@@ -3,6 +3,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "camera/camera.hpp"
+#include "datrix/datrix.hpp"
 
 
 void draw(Model &model) {
@@ -40,7 +41,6 @@ void createTexture(Model &model, int &stopper) {
 }
 
 
-
 void createVaoVbo(Model &model) {
 	const std::vector<float>		triangles = model.getTriangles();
 	const std::vector<glm::vec3>	normals = model.getNormals();
@@ -70,25 +70,12 @@ void createVaoVbo(Model &model) {
 	}
 }
 
-glm::vec3 calculateCenter(const std::vector<float> &triangles) {
-	glm::vec3 sum(0.0f);
-	const size_t totalVertices = triangles.size() / 5;
-
-	for (size_t i = 0; i < triangles.size(); i += 5) {
-		sum.x += triangles[i];
-		sum.y += triangles[i + 1];
-		sum.z += triangles[i + 2];
-	}
-	return sum / static_cast<float>(totalVertices);
-}
-
 
 void rendererLoop(GLFWwindow *window, Shader &shader, Model &model, Camera &camera) {
 
 	int light = 2;
 	int v = 0;
 	int stopper = -1;
-	//glm::vec3 color(0.33f, 0.21f, 1.06f); //blue
 	glm::vec3	color(1.33f, 1.0f, 1.06f); //blue
 	float		axis = 0.0f;
 	std::vector<float>	triangles = model.getTriangles();
@@ -97,7 +84,7 @@ void rendererLoop(GLFWwindow *window, Shader &shader, Model &model, Camera &came
 	while (!glfwWindowShouldClose(window)) {
 		createTexture(model, stopper);
 
-		model.matrix = glm::mat4(1.0f);
+		model.matrix = Datrix(1.0f).getMatrix();
 		std::vector<float> allTriangles;
 		allTriangles.insert(allTriangles.end(), triangles.begin(), triangles.end());
 		glm::vec3 objectCenter = calculateCenter(allTriangles);
@@ -109,15 +96,20 @@ void rendererLoop(GLFWwindow *window, Shader &shader, Model &model, Camera &came
 		model.matrix = glm::rotate(model.matrix, glm::radians(axis), glm::vec3(0.0f, 1.0f, 0.0f));
 		model.matrix = glm::rotate(model.matrix, glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model.matrix = glm::translate(model.matrix, -objectCenter);
-		axis += 1.0f;
+		if (axis >= 3600)
+			axis = 0;
+		else
+			axis += 1.0f;
 
-		glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+
+		glClearColor(0.0f, 0.0f, 01.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glPolygonMode(GL_FRONT_AND_BACK, (
 			model.mode == 0) ? GL_LINE : (model.mode == 1)  ? GL_POINT : GL_FILL
 			);
 
-		//glActiveTexture(GL_TEXTURE);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, model.tex.id);
 
 		// keyPressHandler(window, version, camera, object, shader, color);
 		glUseProgram(shader.getId());
@@ -128,36 +120,22 @@ void rendererLoop(GLFWwindow *window, Shader &shader, Model &model, Camera &came
 
 		glUniformMatrix4fv(glGetUniformLocation(shader.getId(), "model"), 1, GL_FALSE, &model.matrix[0][0]);
 
-		glm::mat4 modelMatrix = glm::mat4(1.0f);
+		Datrix	model_matrix(1.0f);
+		Datrix	projection_matrix = Datrix(1.0f).perspective(
+			glm::radians(45.0f),
+			static_cast<float>(WINDOW_W) / static_cast<float>(WINDOW_H),
+			0.1f, 1500.0f);
 
-		glm::mat4 projectionMatrix =
-			glm::perspective(glm::radians(45.0f),
-							 static_cast<float>(WINDOW_W) / static_cast<float>(WINDOW_H),
-							 0.1f, 1500.0f);
+		Datrix	view_matrix = camera.getView2();
+		glm::mat4 model_view_projection_matrix = projection_matrix.getMatrix() * view_matrix.getMatrix() * model_matrix.getMatrix();
 
-		glm::mat4 viewMatrix = camera.getView();
-		//glm::mat4 viewMatrix = camera.createView(
-		//	glm::vec3(0.0f, 0.0f, 3.0f),	// position
-		//	glm::vec3(0.0f, 0.0f, -1.0f),	// front
-		//	glm::vec3(0.0f, 0.5f, 0.0f)	// up
-		//	);
+		glUniformMatrix4fv(glGetUniformLocation(shader.getId(), "modelViewProjectionMatrix"), 1, GL_FALSE, &model_view_projection_matrix[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(shader.getId(), "projection"), 1, GL_FALSE, &projection_matrix.getMatrix()[0][0]);
 
-		//glm::mat4 viewMatrix = glm::lookAt(
-		//	glm::vec3(0.0f, 0.0f, -45.0f),
-		//	glm::vec3(0.0f, 0.0f, 0.0f) + glm::vec3(0.0f, 0.0f, -1.0f),	// here should be position + front
-		//	glm::vec3(0.0f, 0.5f, 0.0f));
-
-		glm::mat4 modelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
-
-		glUniformMatrix4fv(glGetUniformLocation(shader.getId(), "modelViewProjectionMatrix"), 1, GL_FALSE, &modelViewProjectionMatrix[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(shader.getId(), "projection"), 1, GL_FALSE, &projectionMatrix[0][0]);
-
-		glUniformMatrix4fv(glGetUniformLocation(shader.getId(), "view"), 1, GL_FALSE, &viewMatrix[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(shader.getId(), "view"), 1, GL_FALSE, &view_matrix.getMatrix()[0][0]);
 
 		draw(model);
-
 		key(window, v, model, camera);
-
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -165,11 +143,9 @@ void rendererLoop(GLFWwindow *window, Shader &shader, Model &model, Camera &came
 
 
 
-int main(int argc, char **argv) {
-	// validator here
+int main(const int argc, char **argv) {
 	if (argc < 3) {
 		std::cerr << "Usage: " << argv[0] << " <file.obj> <vector shaders> <fragment shaders> [textures]" << std::endl;
-		// TODO Add default shaders
 		return EXIT_FAILURE;
 	}
 

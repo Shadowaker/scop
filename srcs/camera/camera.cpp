@@ -1,4 +1,5 @@
 #include "../../headers/camera/camera.hpp"
+#include "../../headers/datrix/datrix.hpp"
 
 Camera::Camera() {
 
@@ -6,7 +7,7 @@ Camera::Camera() {
 	front = glm::vec3(0.0f, 0.0f, -1.0f);
 	up = glm::vec3(0.0f, 0.5f, 0.0f);
 	side = glm::normalize(glm::cross(front, DEFAULT_UP));
-	view = glm::lookAt(position, position + front, up);
+	view = Datrix::lookAtGl(position, position + front, up);
 }
 
 Camera::~Camera() {
@@ -26,7 +27,12 @@ glm::vec3 Camera::getUp() const {
 }
 
 glm::mat4 Camera::getView() const {
+	//return Datrix::lookAtGl(position, position + front, up);
 	return glm::lookAt(position, position + front, up);
+}
+
+Datrix	Camera::getView2() const {
+	return Datrix::lookAt(position, position + front, up);
 }
 
 void Camera::setPosition(const glm::vec3 new_position) {
@@ -49,7 +55,8 @@ glm::mat4 Camera::createView(const glm::vec3 new_position, const glm::vec3 new_f
 	this->setPosition(new_position);
 	this->setFront(new_front);
 	this->setUp(new_up);
-	glm::mat4 new_view = glm::lookAt(new_position, new_position + new_front, new_up);
+	//glm::mat4 new_view = glm::lookAt(new_position, new_position + new_front, new_up);
+	glm::mat4 new_view = Datrix::lookAtGl(new_position, new_position + new_front, new_up);
 	this->view = new_view;
 
 	return new_view;
@@ -80,16 +87,16 @@ void Camera::goDown() {
 }
 
 void Camera::pitchUp() {
-	front.y += SPEED;
+	front.y += ROT_SPEED;
 }
 void Camera::pitchDown() {
-	front.y -= SPEED;
+	front.y -= ROT_SPEED;
 }
 
 void Camera::rotateRight() {
-	front.x += SPEED;
+	front.x += ROT_SPEED;
 }
 
 void Camera::rotateLeft() {
-	front.x -= SPEED;
+	front.x -= ROT_SPEED;
 }
