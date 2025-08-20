@@ -4,6 +4,8 @@
 #include "stb_image.h"
 #include "camera/camera.hpp"
 #include "datrix/datrix.hpp"
+#include <iostream>
+#include <fstream>
 
 
 void draw(Model &model) {
@@ -40,7 +42,6 @@ int createTexture(Model &model, int &stopper) {
 			return 1;
 		}
 		stbi_image_free(data);
-		data = nullptr;
 		stopper = model.tex.type;
 		return 0;
 	}
@@ -146,17 +147,28 @@ void rendererLoop(GLFWwindow *window, Shader &shader, Model &model, Camera &came
 	}
 }
 
-
-
 int main(const int argc, char **argv) {
-	if (argc < 3) {
+	if (argc < 4) {
 		std::cerr << "Usage: " << argv[0] << " <file.obj> <vector shaders> <fragment shaders> [textures]" << std::endl;
+		return EXIT_FAILURE;
+	}
+
+	const std::string file_path(argv[1]);
+	Model model;
+
+	try {
+		model = Model(file_path);
+		Model::loadExtenalTextures(model, argv);
+	}
+	catch (const Model::ModelException &e) {
+		std::cerr << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
 
 	if (!glfwInit()) {
 		std::cerr << "Failed to initialize GLFW" << std::endl;
-		return -1;
+		glfwTerminate();
+		return EXIT_FAILURE;
 	}
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -167,14 +179,7 @@ int main(const int argc, char **argv) {
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	#endif
 
-	const std::string file_path(argv[1]);
-
-
-	Model model(file_path);
-
 	GLFWwindow *window = create_window(model);
-
-	Model::loadExtenalTextures(model, argv);
 
 	try {
 		Shader shader(argv[2], argv[3], model);
