@@ -51,7 +51,7 @@ class Shader {
 	private:
 		GLuint	program_id;
 		GLuint	vertex, fragment;
-		GLuint	ka, kd, ks, d, tr, ns, illum;
+		GLuint	ka, kd, ks, d, tr, ns, illum, light_pos;
 
 	static void loadMTLToFragment(Shader &self, const Model &model);
 };

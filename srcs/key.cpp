@@ -17,31 +17,32 @@ std::vector<int> MOVEMENT_KEYS = {
 void	movement_handler(Camera &camera, int key_pressed) {
 	if (key_pressed == GLFW_KEY_W)
 		camera.forward();
-	if (key_pressed == GLFW_KEY_S)
+	else if (key_pressed == GLFW_KEY_S)
 		camera.backward();
-	if (key_pressed == GLFW_KEY_A)
+	else if (key_pressed == GLFW_KEY_A)
 		camera.left();
-	if (key_pressed == GLFW_KEY_D)
+	else if (key_pressed == GLFW_KEY_D)
 		camera.right();
-	if (key_pressed == GLFW_KEY_SPACE)
+	else if (key_pressed == GLFW_KEY_SPACE)
 		camera.goUp();
-	if (key_pressed == GLFW_KEY_LEFT_CONTROL)
+	else if (key_pressed == GLFW_KEY_LEFT_CONTROL)
 		camera.goDown();
-	if (key_pressed == GLFW_KEY_UP)
+	else if (key_pressed == GLFW_KEY_UP)
 		camera.pitchUp();
-	if (key_pressed == GLFW_KEY_DOWN)
+	else if (key_pressed == GLFW_KEY_DOWN)
 		camera.pitchDown();
-	if (key_pressed == GLFW_KEY_RIGHT)
+	else if (key_pressed == GLFW_KEY_RIGHT)
 		camera.rotateRight();
-	if (key_pressed == GLFW_KEY_LEFT)
+	else if (key_pressed == GLFW_KEY_LEFT)
 		camera.rotateLeft();
 }
 
 
-void	key(GLFWwindow *window, int &version, Model &model, Camera &camera) {
+void	key(GLFWwindow *window, int &version, float &light, Model &model, Camera &camera) {
 	static bool	t_key_locker = false;
 	static bool	shift_key_locker = false;
 	static bool	m_key_locker = false;
+	static bool l_key_locker = false;
 
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -54,6 +55,9 @@ void	key(GLFWwindow *window, int &version, Model &model, Camera &camera) {
 			version = 0;
 		else
 			version += 1;
+		if constexpr (DEBUG) {
+			std::cout << "Version: " << version << std::endl;
+		}
 		shift_key_locker = true;
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
@@ -72,7 +76,7 @@ void	key(GLFWwindow *window, int &version, Model &model, Camera &camera) {
 		t_key_locker = false;
 
 	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && !m_key_locker) {
-		if (model.mode == 3)
+		if (model.mode == 2)
 			model.mode = 0;
 		else
 			model.mode += 1;
@@ -80,6 +84,19 @@ void	key(GLFWwindow *window, int &version, Model &model, Camera &camera) {
 	}
 	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_RELEASE)
 		m_key_locker = false;
+
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS && !l_key_locker) {
+		if (light > 1.0)
+			light = 0.1;
+		else
+			light += 0.1;
+		if constexpr (DEBUG) {
+			std::cout << "light: " << light << std::endl;
+		}
+		l_key_locker = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_RELEASE)
+		l_key_locker = false;
 
 	for (const auto& i : MOVEMENT_KEYS)
 		if (glfwGetKey(window, i) == GLFW_PRESS) {

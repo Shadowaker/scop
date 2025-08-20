@@ -81,7 +81,7 @@ void createVaoVbo(Model &model) {
 
 void rendererLoop(GLFWwindow *window, Shader &shader, Model &model, Camera &camera) {
 
-	int light = 2;
+	float light = 0.1;
 	int v = 0;
 	int stopper = -1;
 	glm::vec3	color(1.33f, 1.0f, 1.06f); //blue
@@ -120,7 +120,7 @@ void rendererLoop(GLFWwindow *window, Shader &shader, Model &model, Camera &came
 		glBindTexture(GL_TEXTURE_2D, model.tex.id);
 		glUseProgram(shader.getId());
 		glUniform1i(glGetUniformLocation(shader.getId(), "useTexture"), v);
-		glUniform1i(glGetUniformLocation(shader.getId(), "useLight"), light);
+		glUniform1f(glGetUniformLocation(shader.getId(), "useLight"), light);
 		glUniform1i(glGetUniformLocation(shader.getId(), "texture"), 0);
 		glUniform3fv(glGetUniformLocation(shader.getId(), "objectColor"),1 , &color[0]);
 
@@ -141,7 +141,7 @@ void rendererLoop(GLFWwindow *window, Shader &shader, Model &model, Camera &came
 		glUniformMatrix4fv(glGetUniformLocation(shader.getId(), "view"), 1, GL_FALSE, &view_matrix.getMatrix()[0][0]);
 
 		draw(model);
-		key(window, v, model, camera);
+		key(window, v, light, model, camera);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

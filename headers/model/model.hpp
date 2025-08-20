@@ -18,9 +18,9 @@
 # include <array>			// used by model.cpp
 # include <cmath>			// used by model.cpp
 
-# define LIGHT_POS_X 0.0f
-# define LIGHT_POS_Y 0.0f
-# define LIGHT_POS_Z 0.0f
+# define LIGHT_POS_X 3.0f
+# define LIGHT_POS_Y 4.0f
+# define LIGHT_POS_Z 2.0f
 # define LIGHT_DIR_X 0.0f
 # define LIGHT_DIR_Y 0.0f
 # define LIGHT_DIR_Z 0.0f

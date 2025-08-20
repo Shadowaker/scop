@@ -18,7 +18,7 @@ unsigned int compileShader(unsigned int type, const char* source) {
 	return shader_id;
 }
 
-Shader::Shader(): ka(0), kd(0), ks(0), d(0), tr(0), ns(0), illum(0) {
+Shader::Shader(): ka(0), kd(0), ks(0), d(0), tr(0), ns(0), illum(0), light_pos(0) {
 	program_id = 0;
 	vertex = 0;
 	fragment = 0;
@@ -29,7 +29,7 @@ Shader::Shader(): ka(0), kd(0), ks(0), d(0), tr(0), ns(0), illum(0) {
 }
 
 
-Shader::Shader(const char *vpath, const char *fpath, const Model &model) : ka(0), kd(0), ks(0), d(0), tr(0), ns(0), illum(0) {
+Shader::Shader(const char *vpath, const char *fpath, const Model &model) : ka(0), kd(0), ks(0), d(0), tr(0), ns(0), illum(0), light_pos(0) {
 	std::string vert, frag;
 	std::ifstream vfile, ffile;
 	std::stringstream vstream, fstream;
@@ -118,7 +118,18 @@ void Shader::loadMTLToFragment(Shader &self, const Model &model) {
 	self.tr = glGetUniformLocation(self.program_id, "Tr");
 	self.ns = glGetUniformLocation(self.program_id, "Ns");
 	self.illum = glGetUniformLocation(self.program_id, "illum");
-	const GLuint lightPosLoc = glGetUniformLocation(self.program_id, "LightPos");
+	self.light_pos = glGetUniformLocation(self.program_id, "LightPos");
+
+	if constexpr (DEBUG) {
+		std::cout << "ka: " << mtl.ka.r << " " << mtl.ka.g << " " << mtl.ka.b << std::endl;
+		std::cout << "kd: " << mtl.kd.r << " " << mtl.kd.g << " " << mtl.kd.b << std::endl;
+		std::cout << "ks: " << mtl.ks.r << " " << mtl.ks.g << " " << mtl.ks.b << std::endl;
+		std::cout << "d: " << mtl.d << std::endl;
+		std::cout << "tr: " << mtl.tr << std::endl;
+		std::cout << "ns: " << mtl.ns << std::endl;
+		std::cout << "illum: " << mtl.illum << std::endl;
+		std::cout << "light_pos: " << model.light_source.x << " " << model.light_source.y << " " << model.light_source.z << std::endl;
+	}
 
 	glUseProgram(self.program_id);
 	glUniform3f(self.ka, mtl.ka.r, mtl.ka.g, mtl.ka.b);
@@ -128,7 +139,7 @@ void Shader::loadMTLToFragment(Shader &self, const Model &model) {
 	glUniform1f(self.d, mtl.d);
 	glUniform1f(self.ns, mtl.ns);
 	glUniform1i(self.illum, mtl.illum);
-	glUniform3f(lightPosLoc, model.light_source.x, model.light_source.y,model.light_source.z);
+	glUniform3f(self.light_pos, model.light_source.x, model.light_source.y, model.light_source.z);
 }
 
 unsigned int Shader::getId() const {
