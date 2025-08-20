@@ -2,7 +2,7 @@
 NAME		= scop
 CC			= c++
 LDFLAGS		= -lglfw -lGLEW -lGL
-CFLAGS		= -std=c++17 -g -Wall -Wextra -Werror
+CFLAGS		= -std=c++17 -g -Wall -Wextra -Werror -D DEBUG=1
 DFLAGS		= -MMD -MF $(@:.o=.d)
 AUTHOR		= dridolfo
 DATE		= 08/2025

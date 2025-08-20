@@ -8,10 +8,16 @@ Camera::Camera() {
 	up = glm::vec3(0.0f, 0.5f, 0.0f);
 	side = glm::normalize(glm::cross(front, DEFAULT_UP));
 	view = Datrix::lookAtGl(position, position + front, up);
+
+	if constexpr (DEBUG) {
+		std::cout << "Camera created." << std::endl;
+	}
 }
 
 Camera::~Camera() {
-
+	if constexpr (DEBUG) {
+		std::cout << "Camera destroyed." << std::endl;
+	}
 }
 
 glm::vec3 Camera::getPosition() const {
@@ -27,8 +33,7 @@ glm::vec3 Camera::getUp() const {
 }
 
 glm::mat4 Camera::getView() const {
-	//return Datrix::lookAtGl(position, position + front, up);
-	return glm::lookAt(position, position + front, up);
+	return Datrix::lookAtGl(position, position + front, up);
 }
 
 Datrix	Camera::getView2() const {
@@ -55,7 +60,6 @@ glm::mat4 Camera::createView(const glm::vec3 new_position, const glm::vec3 new_f
 	this->setPosition(new_position);
 	this->setFront(new_front);
 	this->setUp(new_up);
-	//glm::mat4 new_view = glm::lookAt(new_position, new_position + new_front, new_up);
 	glm::mat4 new_view = Datrix::lookAtGl(new_position, new_position + new_front, new_up);
 	this->view = new_view;
 

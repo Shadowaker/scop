@@ -14,9 +14,13 @@ void draw(Model &model) {
 }
 
 
-void createTexture(Model &model, int &stopper) {
+int createTexture(Model &model, int &stopper) {
 
 	if (stopper != model.tex.type) {
+		const std::vector<char *> textures = model.getExternalTextures();
+		if (textures.empty())
+			return 1;
+
 		glGenTextures(1, &model.tex.id);
 		glBindTexture(GL_TEXTURE_2D, model.tex.id);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -25,19 +29,22 @@ void createTexture(Model &model, int &stopper) {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		int width, height, chs;
-		const std::vector<char *> textures = model.getExternalTextures();
-
 		unsigned char *data =
 			stbi_load(textures[model.tex.type], &width, &height, &chs, 0);
 		if (data) {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE,
 						 data);
 			glGenerateMipmap(GL_TEXTURE_2D);
-		} else
-			std::cout << "Failed to load texture" << std::endl;
+		}
+		else {
+			return 1;
+		}
 		stbi_image_free(data);
+		data = nullptr;
 		stopper = model.tex.type;
+		return 0;
 	}
+	return 0;
 }
 
 
@@ -79,17 +86,17 @@ void rendererLoop(GLFWwindow *window, Shader &shader, Model &model, Camera &came
 	glm::vec3	color(1.33f, 1.0f, 1.06f); //blue
 	float		axis = 0.0f;
 	std::vector<float>	triangles = model.getTriangles();
-	std::cout << model.getExternalTextures().size() << std::endl;
 
 	while (!glfwWindowShouldClose(window)) {
-		createTexture(model, stopper);
+		if (createTexture(model, stopper)) {
+			//std::cout << "Failed to create texture" << std::endl;
+			//break ;
+		}
 
 		model.matrix = Datrix(1.0f).getMatrix();
 		std::vector<float> allTriangles;
 		allTriangles.insert(allTriangles.end(), triangles.begin(), triangles.end());
 		glm::vec3 objectCenter = calculateCenter(allTriangles);
-
-		//std::cout << objectCenter.x << " " << objectCenter.y << " " << objectCenter.z << std::endl;
 
 		model.matrix = glm::translate(model.matrix, objectCenter);
 		model.matrix = glm::rotate(model.matrix, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -164,10 +171,12 @@ int main(const int argc, char **argv) {
 
 	const std::string file_path(argv[1]);
 
+
 	Model model(file_path);
-	Model::loadExtenalTextures(model, argv);
 
 	GLFWwindow *window = create_window(model);
+
+	Model::loadExtenalTextures(model, argv);
 
 	Shader shader(argv[2], argv[3], model);
 	Camera camera;
@@ -178,6 +187,10 @@ int main(const int argc, char **argv) {
 
 	glDeleteVertexArrays(1, &model.vao);
 	glDeleteBuffers(1, &model.vbo);
+	if (model.vbo_normal) {
+		glDeleteBuffers(1, &model.vbo_normal);
+	}
+	glDeleteTextures(1, &model.tex.id);
 	glfwTerminate();
 	return 0;
 }

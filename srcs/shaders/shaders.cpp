@@ -18,7 +18,7 @@ unsigned int compileShader(unsigned int type, const char* source) {
 	return shader_id;
 }
 
-Shader::Shader(): ka(0), kd(0), ks(0), d(0), tr(0), ns(0), illum(0){
+Shader::Shader(): ka(0), kd(0), ks(0), d(0), tr(0), ns(0), illum(0) {
 	program_id = 0;
 	vertex = 0;
 	fragment = 0;
@@ -29,12 +29,14 @@ Shader::Shader(): ka(0), kd(0), ks(0), d(0), tr(0), ns(0), illum(0){
 }
 
 
-Shader::Shader(const char *vpath, const char *fpath, const Model &model) {
+Shader::Shader(const char *vpath, const char *fpath, const Model &model) : ka(0), kd(0), ks(0), d(0), tr(0), ns(0), illum(0) {
 	std::string vert, frag;
 	std::ifstream vfile, ffile;
 	std::stringstream vstream, fstream;
 
-
+	if constexpr (DEBUG) {
+		std::cout << "Compiling Shaders" << std::endl;
+	}
 	try {
 		vfile.open(vpath);
 		vstream << vfile.rdbuf();
@@ -55,8 +57,12 @@ Shader::Shader(const char *vpath, const char *fpath, const Model &model) {
 
 	const char *v = vert.c_str(), *f = frag.c_str();
 
+
 	vertex = compileShader(GL_VERTEX_SHADER, v);
 	fragment = compileShader(GL_FRAGMENT_SHADER, f);
+	if constexpr (DEBUG) {
+		std::cout << "Done." << std::endl;
+	}
 
 	program_id = glCreateProgram();
 
@@ -74,7 +80,17 @@ Shader::Shader(const char *vpath, const char *fpath, const Model &model) {
 
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);
+	if constexpr (DEBUG) {
+		std::cout << "Loading materials to fragment." << std::endl;
+	}
 	loadMTLToFragment(*this, model);
+	if constexpr (DEBUG) {
+		std::cout << "Done." << std::endl;
+	}
+
+	if constexpr (DEBUG) {
+		std::cout << "Shaders created" << std::endl;
+	}
 }
 
 Shader::~Shader() {

@@ -1,6 +1,12 @@
 #ifndef CAMERA_HPP
 # define CAMERA_HPP
 
+# ifndef DEBUG
+#  define DEBUG 0
+# endif
+
+# include <iostream>
+
 # include <glm/gtc/type_ptr.hpp>
 # include <glm/glm.hpp>
 
