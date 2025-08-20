@@ -5,6 +5,7 @@ out vec4 FragColor;
 in vec2 TexCoord;
 in vec3 FragNormal;
 in vec3 FragPos;
+flat in int VertexID;
 
 uniform sampler2D texture1;
 uniform int useTexture;
@@ -43,6 +44,9 @@ void main() {
 		finalColor = texColor.rgb;
 	} else if (useTexture == 2) {
 		finalColor = objectColor * lighting;
+		if (VertexID % 2 == 0) {
+		    finalColor /= 0.5;
+        }
 	} else if (useTexture == 3) {
 		finalColor = texColor.rgb * lighting;
 	} else if (useTexture == 4) {
@@ -52,5 +56,6 @@ void main() {
 		finalColor = objectColor;
 	}
 	finalColor *= transparency;
+
     FragColor = vec4(finalColor, texColor.a);
 }

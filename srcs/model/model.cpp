@@ -81,6 +81,7 @@ void Model::loadModel(Model &self, const std::string &file_path) {
 
 	std::string line;
 	std::ifstream ofile(file_path);
+	bool mtl_loaded = false;
 
 	if (!ofile.is_open()) {
 		throw FileError(file_path);
@@ -97,6 +98,7 @@ void Model::loadModel(Model &self, const std::string &file_path) {
 		}
 		else if (prefix == "mtllib") {
 			loadMaterialDefinitions(self, stream, prefix, file_path);
+			mtl_loaded = true;
 		}
 		else if (prefix == "v") {
 			load_vertex(self, stream);
@@ -114,6 +116,12 @@ void Model::loadModel(Model &self, const std::string &file_path) {
 			self.c++;
 			load_faces(self, stream);
 		}
+	}
+
+	if (!mtl_loaded) {
+		std::istringstream stream(std::string("default.mtl"));
+		std::string tmp;
+		loadMaterialDefinitions(self, stream, tmp, "file_path");
 	}
 	ofile.close();
 
@@ -161,7 +169,7 @@ void Model::loadMaterialDefinitions(
 	)
 {
 	stream >> file_path;
-	std::string file = file_path;
+	std::string file = "./resources/" + file_path;
 	std::ifstream mfile(file);
 
 	if (mfile.is_open()) {
