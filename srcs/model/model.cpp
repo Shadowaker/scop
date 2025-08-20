@@ -36,8 +36,7 @@ void load_faces(Model &model, std::istringstream &stream) {
 		model.setSlash(slash);
 	}
 	else
-		std::cerr << "Invalid face. Too many indexes(" << faces.size() << ".\n";
-	// TODO RAISE ERROR
+		throw Model::CreationError("Too many indexes: " + std::to_string(faces.size()));
 }
 
 // ---------------------------------------------
@@ -84,9 +83,7 @@ void Model::loadModel(Model &self, const std::string &file_path) {
 	std::ifstream ofile(file_path);
 
 	if (!ofile.is_open()) {
-		// TODO ADD EXCEPTION HERE
-		std::cerr << "File Error: " << file_path << std::endl;
-		return;
+		throw FileError(file_path);
 	}
 
 	while (std::getline(ofile, line)) {
@@ -190,7 +187,6 @@ void Model::loadMaterialDefinitions(
 				sstream >> self.material.ni;
 			else if (prefix == "illum")
 				sstream >> self.material.illum;
-			// else if (prefix == "map_Ka") TODO implement map textures
 		}
 		mfile.close();
 	} else
@@ -329,11 +325,6 @@ void Model::setSlash(const bool new_slash) {
 
 void Model::loadExtenalTextures(Model &self, char **paths) {
 	int i = 4;
-
-	if (paths[i] == nullptr) { // i = 4
-		//fallback to default textures
-		// TODO default textures
-	}
 	while (paths[i] != nullptr) self.external_textures.push_back(paths[i++]);
 }
 

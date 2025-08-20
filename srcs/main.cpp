@@ -117,8 +117,6 @@ void rendererLoop(GLFWwindow *window, Shader &shader, Model &model, Camera &came
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, model.tex.id);
-
-		// keyPressHandler(window, version, camera, object, shader, color);
 		glUseProgram(shader.getId());
 		glUniform1i(glGetUniformLocation(shader.getId(), "useTexture"), v);
 		glUniform1i(glGetUniformLocation(shader.getId(), "useLight"), light);
@@ -178,12 +176,26 @@ int main(const int argc, char **argv) {
 
 	Model::loadExtenalTextures(model, argv);
 
-	Shader shader(argv[2], argv[3], model);
-	Camera camera;
+	try {
+		Shader shader(argv[2], argv[3], model);
+		Camera camera;
 
-	createVaoVbo(model);
+		createVaoVbo(model);
 
-	rendererLoop(window, shader, model, camera);
+		rendererLoop(window, shader, model, camera);
+	}
+	// Bad shaders, exit somewhat gracefully
+	catch (Shader::ShaderException &e) {
+		std::cerr << e.what() << std::endl;
+		glDeleteVertexArrays(1, &model.vao);
+		glDeleteBuffers(1, &model.vbo);
+		if (model.vbo_normal) {
+			glDeleteBuffers(1, &model.vbo_normal);
+		}
+		glDeleteTextures(1, &model.tex.id);
+		glfwTerminate();
+		return EXIT_FAILURE;
+	}
 
 	glDeleteVertexArrays(1, &model.vao);
 	glDeleteBuffers(1, &model.vbo);

@@ -1,19 +1,19 @@
 #include "../../headers/shaders/shaders.hpp"
+#include "shaders/shaders.hpp"
 
 // OpenGL Doc
 unsigned int compileShader(unsigned int type, const char* source) {
 	unsigned int shader_id  = glCreateShader(type);
-	glShaderSource(shader_id, 1, &source, NULL);
+	glShaderSource(shader_id, 1, &source, nullptr);
 	glCompileShader(shader_id);
 
 	int success;
 	char infoLog[512];
 	glGetShaderiv(shader_id, GL_COMPILE_STATUS, &success);
 	if (!success) {
-		glGetShaderInfoLog(shader_id, 512, NULL, infoLog);
-		std::cerr << "ERROR::SHADER::COMPILATION_FAILED\n" << infoLog << std::endl;
+		glGetShaderInfoLog(shader_id, 512, nullptr, infoLog);
+		throw Shader::CompilationError(infoLog);
 	}
-	// TODO Create Error in the c++ way, and normalize string
 
 	return shader_id;
 }
@@ -43,7 +43,8 @@ Shader::Shader(const char *vpath, const char *fpath, const Model &model) : ka(0)
 		vfile.close();
 		vert = vstream.str();
 	} catch (std::ifstream::failure &e) {
-		std::cout << "Vertex shaders error: " << e.what() << std::endl;
+		std::cerr << "Vertex shaders error: " << e.what() << std::endl;
+		throw ShaderException("Vertex shaders error");
 	}
 
 	try {
@@ -52,14 +53,21 @@ Shader::Shader(const char *vpath, const char *fpath, const Model &model) : ka(0)
 		ffile.close();
 		frag = fstream.str();
 	} catch (std::ifstream::failure &e) {
-		std::cout << "Fragment shaders error: " << e.what() << std::endl;
+		std::cerr << "Fragment shaders error: " << e.what() << std::endl;
+		throw ShaderException("Fragment shaders error");
 	}
 
 	const char *v = vert.c_str(), *f = frag.c_str();
 
+	try {
+		vertex = compileShader(GL_VERTEX_SHADER, v);
+		fragment = compileShader(GL_FRAGMENT_SHADER, f);
+	}
+	catch (Shader::CompilationError &e) {
+		std::cerr << e.what() << std::endl;
+		throw ShaderException("Compilation error");
+	}
 
-	vertex = compileShader(GL_VERTEX_SHADER, v);
-	fragment = compileShader(GL_FRAGMENT_SHADER, f);
 	if constexpr (DEBUG) {
 		std::cout << "Done." << std::endl;
 	}

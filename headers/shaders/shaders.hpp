@@ -10,6 +10,7 @@
 # include <fstream>		// used by shader.cpp
 # include <sstream>		// used by shader.cpp
 # include <iostream>	// used by shader.cpp
+#include <utility>
 
 # include "../model/model.hpp"	//	used by shader.cpp
 
@@ -24,6 +25,28 @@ class Shader {
 		~Shader();
 
 		unsigned int getId() const;
+
+	class ShaderException : public std::exception {
+		protected:
+			std::string _reason;
+
+		public:
+			explicit ShaderException(std::string reason) : _reason(std::move(reason)) {};
+			virtual ~ShaderException() throw() {};
+			virtual const char *what() const throw() {
+				return (_reason.c_str());
+			};
+		};
+
+	class CompilationError final : public ShaderException {
+
+		public:
+			explicit CompilationError(const std::string &infos) : ShaderException("[ERROR] Shader compilation failed: " + infos) {};
+			virtual ~CompilationError() throw() {};
+			virtual const char *what() const throw() {
+				return (_reason.c_str());
+			};
+	};
 
 	private:
 		GLuint	program_id;

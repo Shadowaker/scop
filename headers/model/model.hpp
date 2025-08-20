@@ -82,6 +82,37 @@ class Model {
 		glm::vec3		light_source{};
 		Texture			tex{};
 
+	class ModelException : public std::exception {
+		protected:
+			std::string _reason;
+
+		public:
+			ModelException(std::string reason) : _reason(reason) {};
+			virtual ~ModelException() throw() {};
+			virtual const char *what() const throw() {
+				return (_reason.c_str());
+			};
+	};
+
+	class CreationError final : public ModelException {
+
+		public:
+			explicit CreationError(const std::string &infos) : ModelException("[ERROR] Model creation failed: " + infos) {};
+			virtual ~CreationError() throw() {};
+			virtual const char *what() const throw() {
+				return (_reason.c_str());
+			};
+		};
+
+	class FileError final : public ModelException {
+		public:
+			explicit FileError(const std::string &fp) : ModelException("[ERROR] File " + fp + " could not be opened.") {};
+			virtual ~FileError() throw() {};
+			virtual const char *what() const throw() {
+				return (_reason.c_str());
+			}
+		};
+
 
 	private:
 		int									c = 0;			// face counter
